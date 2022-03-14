@@ -1,21 +1,12 @@
 package com.efrei.thdesgrphs.automaton;
 
-public class State {
+import java.util.List;
 
-    private int id;
-    private List<Transition> constraints;
+public record State(int id, double cost, List<Integer> predecessors) {
 
-    public int getId() {
-        return id;
-    }
-
-    public List<Transition> getConstraints() {
-        return constraints;
-    }
-
-    private static class Transition {
-        double cost;
-        State previous;
-        State next;
+    public void addPredecessor(Integer predecessor) {
+        if (!this.predecessors.contains(predecessor)) {
+            this.predecessors.add(predecessor);
+        }
     }
 }
