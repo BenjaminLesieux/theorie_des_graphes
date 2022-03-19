@@ -22,21 +22,21 @@ public class FileReader {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             System.err.println("Couldn't find the given file");
+            return null;
         }
 
         do {
-            assert scanner != null;
             var line = scanner.nextLine();
             var values = line.split(" ");
 
             var id = Integer.parseInt(values[0]);
-            var cost = Double.parseDouble(values[1]);
+            var cost = Integer.parseInt(values[1]);
 
             var predecessors = new ArrayList<Integer>();
 
             if (values.length > 2) {
                 for (int i = 2; i < values.length; i++) {
-                    predecessors.add(Integer.valueOf(values[i]));
+                    predecessors.add(Integer.parseInt(values[i]));
                 }
             }
 
@@ -44,6 +44,9 @@ public class FileReader {
             automaton.addState(state);
 
         } while (scanner.hasNextLine());
+
+        automaton.calculateValuesMatrix();
+        automaton.calculateRanks();
 
 
         return automaton;
