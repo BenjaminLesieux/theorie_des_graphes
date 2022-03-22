@@ -46,8 +46,6 @@ public class FileReader {
         } while (scanner.hasNextLine());
 
         automaton.calculateValuesMatrix();
-        automaton.calculateRanks();
-
 
         return automaton;
     }

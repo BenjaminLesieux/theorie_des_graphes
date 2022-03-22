@@ -4,7 +4,7 @@ import com.efrei.thdesgrphs.automaton.Automaton;
 
 import java.util.Arrays;
 import java.util.IntSummaryStatistics;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Operations is a class composed with only static methods
@@ -17,9 +17,6 @@ import java.util.stream.Collectors;
  * */
 public class Operations {
 
-    public static boolean isSchedulingGraph(Automaton automaton) {
-        return false;
-    }
 
     public static <T> void showValuesMatrix(int[][] matrix) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -33,7 +30,7 @@ public class Operations {
                 .replace("[", "")
                 .replace("]", "")
                 .replace(",", "  | ")
-                .replace("0", " ")
+                .replace("-1", "_")
         );
     }
 }

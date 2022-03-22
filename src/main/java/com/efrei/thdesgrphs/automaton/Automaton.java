@@ -1,10 +1,11 @@
 package com.efrei.thdesgrphs.automaton;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class Automaton {
+public class Automaton implements Cloneable {
 
     private List<State> states;
     private Map<State, Integer> ranks;
@@ -22,7 +23,16 @@ public class Automaton {
     public void addState(State state) {
         if (!this.states.contains(state)) {
             this.states.add(state);
+            Collections.sort(this.states);
         }
+    }
+
+    public State getByID(int id) {
+        for (State state : this.states) {
+            if (state.id() == id) return state;
+        }
+
+        return null;
     }
 
     public void calculateValuesMatrix() {
@@ -36,7 +46,7 @@ public class Automaton {
                 }
 
                 else {
-                    valMatrix[i][j] = 0;
+                    valMatrix[i][j] = -1;
                 }
             }
         }
@@ -73,5 +83,15 @@ public class Automaton {
         }
 
         return stringBuilder.toString();
+    }
+
+    @Override
+    public Automaton clone() {
+        Automaton a = new Automaton();
+        for (State s : this.states) {
+            a.addState(new State(s.id(), s.cost(), s.predecessors()));
+        }
+
+        return a;
     }
 }
