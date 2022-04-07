@@ -2,6 +2,7 @@ package com.efrei.thdesgrphs.operations;
 
 import com.efrei.thdesgrphs.automaton.Automaton;
 import com.efrei.thdesgrphs.automaton.State;
+import com.efrei.thdesgrphs.io.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,20 @@ import java.util.stream.Collectors;
 public class Scheduling {
 
     public static boolean isSchedulingGraph(Automaton automaton) {
-        return hasOneEntry(automaton) && hasOneExit(automaton) && !hasCircuits(automaton) && !hasNegativeCosts(automaton);
+        if (hasCircuits(automaton) || hasNegativeCosts(automaton)) {
+            System.out.println("Votre graphe n'est pas un graphe d'ordonnancement");
+            return false;
+        }
+
+        if (hasMoreThanOneEntry(automaton))
+            Operations.addAlphaState(automaton);
+
+        if (hasMoreThanOneExit(automaton))
+            Operations.addOmegaState(automaton);
+
+        System.out.println("Votre graphe est désormais bien un graphe d'ordonnancement !");
+
+        return true;
     }
 
     private static boolean hasNegativeCosts(Automaton automaton) {
@@ -19,36 +33,38 @@ public class Scheduling {
 
     public static boolean hasCircuits(Automaton automaton) {
 
-        addOmegaState(automaton);
+        System.out.println(Utils.title("Détection de circuit pour " + automaton.getName()));
 
         Automaton copyAutomaton = automaton.clone();
-        State exitState = copyAutomaton.getByID(getExitsID(copyAutomaton).get(0));
+        copyAutomaton.loadSuccessors();
 
-        if (!isALeaf(copyAutomaton, exitState, true)) {
-            return true;
-        }
+        while (!copyAutomaton.getStates().isEmpty()) {
 
-        return false;
-    }
+            List<State> states = List.copyOf(copyAutomaton.getStates());
 
-    private static boolean isALeaf(Automaton automaton, State leaf, boolean init) {
-
-        if (!init) return false;
-
-        if (automaton.getStates()
-                .stream()
-                .noneMatch(state -> state.predecessors().contains(leaf.id()))) {
-
-            automaton.getStates().remove(leaf);
-
-            for (Integer nextLeaf : leaf.predecessors()) {
-                if (automaton.getByID(nextLeaf) == null) continue;
-                State leafState = automaton.getByID(nextLeaf);
-                init = isALeaf(automaton, leafState, true);
+            if (states.stream().noneMatch(s -> s.predecessors().isEmpty())) {
+                System.out.println("Les états "  + states + " n'ont pas pu être supprimés");
+                System.out.println("L'" + states.get(0) + " est à l'origine du cycle");
+                return true;
             }
 
-            return init;
+            for (State state : states) {
+                if (state.predecessors().isEmpty()) {
+                    for (State successor : state.successors()) {
+                        // Removal of the transition between the state and its successor
+                        successor.predecessors().remove((Integer) state.id());
+                    }
+
+                    state.successors().clear();
+                    copyAutomaton.getStates().remove(state);
+
+                    System.out.println("Suppression du point d'entrée suivant : " + state);
+                    System.out.println("États restants : " + copyAutomaton.getStates() + "\n");
+                }
+            }
         }
+
+        System.out.println("L'automate " + automaton.getName() + " ne comporte aucun cycle");
 
         return false;
     }
@@ -62,8 +78,8 @@ public class Scheduling {
                 .collect(Collectors.toList());
     }
 
-    private static boolean hasOneEntry(Automaton automaton) {
-        return getEntriesID(automaton).size() == 1;
+    public static boolean hasMoreThanOneEntry(Automaton automaton) {
+        return getEntriesID(automaton).size() != 1;
     }
 
     public static List<Integer> getExitsID(Automaton automaton) {
@@ -78,27 +94,7 @@ public class Scheduling {
         return exits;
     }
 
-    private static boolean hasOneExit(Automaton automaton) {
-        return getExitsID(automaton).size() == 1;
-    }
-
-    private static void addOmegaState(Automaton automaton) {
-        if (!hasOneExit(automaton)) {
-            List<Integer> exits = getExitsID(automaton);
-            State state = new State(automaton.getStates().size() + 1, 0, exits);
-            automaton.addState(state);
-        }
-    }
-
-    public static void addAlphaState(Automaton automaton) {
-        if (!hasOneEntry(automaton)) {
-            List<Integer> entries = getEntriesID(automaton);
-            State state = new State(0, 0, new ArrayList<>());
-            automaton.addState(state);
-
-            for (Integer entry : entries) {
-                automaton.getByID(entry).predecessors().add(state.id());
-            }
-        }
+    public static boolean hasMoreThanOneExit(Automaton automaton) {
+        return getExitsID(automaton).size() != 1;
     }
 }

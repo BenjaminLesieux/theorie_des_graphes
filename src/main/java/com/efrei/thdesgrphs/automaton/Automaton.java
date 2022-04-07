@@ -1,19 +1,28 @@
 package com.efrei.thdesgrphs.automaton;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import com.efrei.thdesgrphs.io.Utils;
+import com.efrei.thdesgrphs.operations.Scheduling;
+
+import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class Automaton implements Cloneable {
 
     private List<State> states;
-    private Map<State, Integer> ranks;
+    private Map<Integer, Integer> ranks;
+    private String name;
 
     private int[][] valuesMatrix;
+    private int[][] adjacencyMatrix;
 
-    public Automaton() {
+    public Automaton(String name) {
         this.states = new ArrayList<>();
+        this.ranks = new LinkedHashMap<>();
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public List<State> getStates() {
@@ -35,6 +44,17 @@ public class Automaton implements Cloneable {
         return null;
     }
 
+    public void loadSuccessors() {
+        for (State state : states) {
+            List<Integer> predecessors = state.predecessors();
+            List<State> predecessorsStates = predecessors.stream().map(this::getByID).filter(Objects::nonNull).toList();
+
+            for (State predecessor : predecessorsStates) {
+                predecessor.successors().add(state);
+            }
+        }
+    }
+
     public void calculateValuesMatrix() {
         int[][] valMatrix = new int[states.size()][states.size()];
 
@@ -54,22 +74,80 @@ public class Automaton implements Cloneable {
         this.valuesMatrix = valMatrix;
     }
 
+    public void calculateAdjacencyMatrix() {
+        int[][] adjacencyMatrix = new int[states.size()][states.size()];
+
+        for (int i = 0; i < states.size(); i++) {
+            for (int j = 0; j < states.size(); j++) {
+
+                if (states.get(j).predecessors().contains(i+1)) {
+                    adjacencyMatrix[i][j] = 1;
+                }
+
+                else {
+                    adjacencyMatrix[i][j] = -1;
+                }
+            }
+        }
+
+        this.adjacencyMatrix = adjacencyMatrix;
+    }
+
+    public int[][] getAdjacencyMatrix() {
+        return adjacencyMatrix;
+    }
+
     public int[][] getValuesMatrix() {
+
+        if (this.valuesMatrix.length == 0) this.calculateValuesMatrix();
+
         return valuesMatrix;
     }
 
     public void calculateRanks() {
-        if (this.valuesMatrix == null || this.valuesMatrix.length == 0) {
-            System.err.println("You must calculate the values matrix before calculating the ranks of your states");
-            System.exit(1);
-        }
+        System.out.println(Utils.title("Calcule des rangs des états de : " + name));
 
-        /**
-         * TODO: Perform algorithm
-         * */
+        Queue<Integer> waitingStates = new ArrayBlockingQueue<>(states.size());
+        waitingStates.addAll(states.stream().map(State::id).toList());
+
+        while (!waitingStates.isEmpty()) {
+            Integer currentStateID = waitingStates.remove();
+            State currentState = getByID(currentStateID);
+
+            if (currentState.predecessors().isEmpty()) {
+                ranks.put(currentStateID, 0);
+                System.out.println(currentStateID + " est un état d'entrée, il possède donc le rang 0");
+            }
+            else {
+                List<Integer> predecessors = currentState.predecessors();
+                List<Integer> unknownRanks = predecessors.stream().filter(state -> !ranks.containsKey(state)).toList();
+
+                if (!unknownRanks.isEmpty()) {
+                    for (Integer unknown : unknownRanks) {
+                        if (!waitingStates.contains(unknown)) {
+                            waitingStates.offer(unknown);
+                        }
+                    }
+                    waitingStates.offer(currentStateID);
+                }
+
+                else {
+                    int maxRank = ranks.entrySet()
+                            .stream()
+                            .filter(entry -> predecessors.contains(entry.getKey()))
+                            .map(Map.Entry::getValue)
+                            .max(Integer::compareTo)
+                            .orElse(0);
+
+                    ranks.put(currentStateID, maxRank + 1);
+                    System.out.println("Le rang maximal des prédecesseurs " + currentState.predecessors() + " de " + currentState +  " est = " + maxRank);
+                    System.out.println(" => Rang(" + currentState + ") = " + (maxRank + 1) + "\n");
+                }
+            }
+        }
     }
 
-    public Map<State, Integer> getRanks() {
+    public Map<Integer, Integer> getRanks() {
         return ranks;
     }
 
@@ -77,8 +155,10 @@ public class Automaton implements Cloneable {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
 
+        stringBuilder.append(Utils.title("Automate:" + name));
+
         for(State s : this.states) {
-            stringBuilder.append(s);
+            stringBuilder.append(s.predecessors()).append(" -> ").append(s).append(" -> ").append(s.successors());
             stringBuilder.append("\n");
         }
 
@@ -87,10 +167,19 @@ public class Automaton implements Cloneable {
 
     @Override
     public Automaton clone() {
-        Automaton a = new Automaton();
-        for (State s : this.states) {
-            a.addState(new State(s.id(), s.cost(), s.predecessors()));
+        Automaton a = new Automaton(this.name);
+
+        for (State s : List.copyOf(this.states)) {
+            State copiedState = new State(s.id(), s.cost(), new ArrayList<>(), new ArrayList<>());
+
+            for (Integer pred : s.predecessors()) {
+                copiedState.predecessors().add(pred);
+            }
+
+            a.addState(copiedState);
         }
+
+        a.loadSuccessors();
 
         return a;
     }
