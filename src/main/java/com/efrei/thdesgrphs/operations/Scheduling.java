@@ -16,11 +16,8 @@ public class Scheduling {
             return false;
         }
 
-        if (hasMoreThanOneEntry(automaton))
-            Operations.addAlphaState(automaton);
-
-        if (hasMoreThanOneExit(automaton))
-            Operations.addOmegaState(automaton);
+        Operations.addAlphaState(automaton);
+        Operations.addOmegaState(automaton);
 
         System.out.println("Votre graphe est désormais bien un graphe d'ordonnancement !");
 
@@ -79,7 +76,7 @@ public class Scheduling {
     }
 
     public static boolean hasMoreThanOneEntry(Automaton automaton) {
-        return getEntriesID(automaton).size() != 1;
+        return getEntriesID(automaton).size() > 1;
     }
 
     public static List<Integer> getExitsID(Automaton automaton) {
@@ -95,6 +92,6 @@ public class Scheduling {
     }
 
     public static boolean hasMoreThanOneExit(Automaton automaton) {
-        return getExitsID(automaton).size() != 1;
+        return getExitsID(automaton).size() > 1;
     }
 }

@@ -8,9 +8,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 public class Automaton implements Cloneable {
 
-    private List<State> states;
-    private Map<Integer, Integer> ranks;
-    private String name;
+    private final List<State> states;
+    private final Map<Integer, Integer> ranks;
+    private final String name;
 
     private int[][] valuesMatrix;
     private int[][] adjacencyMatrix;

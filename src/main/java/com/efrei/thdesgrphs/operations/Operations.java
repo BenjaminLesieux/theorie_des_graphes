@@ -62,40 +62,41 @@ public class Operations {
     }
 
     public static void addOmegaState(Automaton automaton) {
-        if (!Scheduling.hasMoreThanOneExit(automaton)) {
-            System.out.println(Utils.subTitle("Ajout de l'état omega (id:" + (automaton.getStates().size()+1) + ") car votre graphe a "
-                    + Scheduling.getExitsID(automaton).size()
-                    + " sorties !"
-            ));
+        System.out.println(Utils.subTitle("Ajout de l'état omega (id:" + (automaton.getStates().size()+1) + ") car votre graphe a "
+                + Scheduling.getExitsID(automaton).size()
+                + " sorties !"
+        ));
 
-            List<Integer> exits = Scheduling.getExitsID(automaton);
-            State state = new State(automaton.getStates().size(), 0, exits, new ArrayList<>());
-            automaton.addState(state);
+        List<Integer> exits = Scheduling.getExitsID(automaton);
+        State state = new State(automaton.getStates().size(), 0, exits, new ArrayList<>());
 
-            for (Integer exit : exits) {
-                State exitState = automaton.getByID(exit);
-                exitState.successors().add(state);
-            }
+        for (Integer exit : exits) {
+            State exitState = automaton.getByID(exit);
+            exitState.successors().add(state);
         }
+
+        automaton.addState(state);
+        automaton.calculateAdjacencyMatrix();
+        automaton.calculateValuesMatrix();
     }
 
     public static void addAlphaState(Automaton automaton) {
-        if (!Scheduling.hasMoreThanOneEntry(automaton)) {
+        System.out.println(Utils.subTitle("Ajout de l'état alpha (id:0) car votre graphe a "
+                + Scheduling.getEntriesID(automaton).size()
+                + " entrées !"
+        ));
 
-            System.out.println(Utils.subTitle("Ajout de l'état alpha (id:0) car votre graphe a "
-                    + Scheduling.getEntriesID(automaton).size()
-                    + " entrées !"
-            ));
+        List<Integer> entries = Scheduling.getEntriesID(automaton);
+        List<State> entriesState = entries.stream().map(automaton::getByID).toList();
+        State state = new State(0, 0, new ArrayList<>(), entriesState);
 
-            List<Integer> entries = Scheduling.getEntriesID(automaton);
-            List<State> entriesState = entries.stream().map(automaton::getByID).toList();
-            State state = new State(0, 0, new ArrayList<>(), entriesState);
+        automaton.addState(state);
 
-            automaton.addState(state);
-
-            for (Integer entry : entries) {
-                automaton.getByID(entry).predecessors().add(state.id());
-            }
+        for (Integer entry : entries) {
+            automaton.getByID(entry).predecessors().add(state.id());
         }
+
+        automaton.calculateAdjacencyMatrix();
+        automaton.calculateValuesMatrix();
     }
 }

@@ -44,6 +44,7 @@ public class Main {
             Operations.showValuesMatrix(graph);
 
             if (Scheduling.isSchedulingGraph(graph)) {
+                Operations.showValuesMatrix(graph);
                 graph.calculateRanks();
                 Date date = new Date(graph);
                 date.buildDates();
