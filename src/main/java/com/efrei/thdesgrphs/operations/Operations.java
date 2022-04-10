@@ -92,8 +92,8 @@ public class Operations {
 
         automaton.addState(state);
 
-        for (Integer entry : entries) {
-            automaton.getByID(entry).predecessors().add(state.id());
+        for (State entry : entriesState) {
+            entry.predecessors().add(state.id());
         }
 
         automaton.calculateAdjacencyMatrix();

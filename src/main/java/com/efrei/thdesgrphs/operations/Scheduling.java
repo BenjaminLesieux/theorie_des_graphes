@@ -70,7 +70,7 @@ public class Scheduling {
     public static List<Integer> getEntriesID(Automaton automaton) {
         return automaton.getStates()
                 .stream()
-                .filter(state -> state.predecessors().size() == 0)
+                .filter(state -> state.predecessors().isEmpty())
                 .map(State::id)
                 .collect(Collectors.toList());
     }
@@ -80,15 +80,11 @@ public class Scheduling {
     }
 
     public static List<Integer> getExitsID(Automaton automaton) {
-        var exits = new ArrayList<Integer>();
-
-        automaton.getStates().forEach(state -> {
-            if (automaton.getStates().stream().noneMatch(otherState -> otherState.predecessors().contains(state.id()))) {
-               exits.add(state.id());
-            }
-        });
-
-        return exits;
+        return automaton.getStates()
+                .stream()
+                .filter(state -> state.successors().isEmpty())
+                .map(State::id)
+                .collect(Collectors.toList());
     }
 
     public static boolean hasMoreThanOneExit(Automaton automaton) {

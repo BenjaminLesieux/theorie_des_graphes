@@ -32,7 +32,7 @@ public class IHM {
         var maxFiles = Objects.requireNonNull(file.listFiles()).length;
 
 
-        while (!Objects.equals(choice, "q")) {
+        while (!choice.equalsIgnoreCase("q")) {
             System.out.println("\n".repeat(3));
             System.out.println(Utils.title("Menu principal"));
             System.out.format("Veuillez choisir un automate : (entrez un nombre entre 1 et %d): ", maxFiles);
@@ -62,7 +62,7 @@ public class IHM {
     public static void operationsMenu() {
         var choice = "";
 
-        while (!Objects.equals(choice, "q")) {
+        while (!choice.equalsIgnoreCase("q")) {
             System.out.println("\n".repeat(2));
             System.out.println(Utils.title("Menu des opérations"));
 
@@ -103,7 +103,7 @@ public class IHM {
     public static void datesMenu() {
         var choice = "";
 
-        while (!Objects.equals(choice, "q")) {
+        while (!choice.equalsIgnoreCase("q")) {
             System.out.println("\n".repeat(2));
             System.out.println(Utils.title("Calcul des dates"));
 

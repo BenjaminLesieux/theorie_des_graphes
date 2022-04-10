@@ -5,7 +5,6 @@ import com.efrei.thdesgrphs.automaton.State;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -14,7 +13,7 @@ public class FileReader {
     public static Automaton readFile(String path) {
 
         File file = new File(path);
-        Scanner scanner = null;
+        Scanner scanner;
         Automaton automaton = new Automaton(file.getName());
 
         try {
@@ -29,7 +28,7 @@ public class FileReader {
             var line = scanner.nextLine();
             var values = line.split(" ");
 
-            if (!Utils.isAnInt(values[0])) continue;
+            if (!Utils.isAnInt(values[0]) || !Utils.isAnInt(values[1])) continue;
 
             var id = Integer.parseInt(values[0]);
             var cost = Integer.parseInt(values[1]);

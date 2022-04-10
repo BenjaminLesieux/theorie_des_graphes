@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        var defaultPath = "src/main/java/com/efrei/thdesgrphs/files/";
+/*        var defaultPath = "src/main/java/com/efrei/thdesgrphs/files/";
 
         var file = new File(defaultPath + "tests/");
         var maxFiles = Objects.requireNonNull(file.listFiles()).length;
@@ -54,6 +54,8 @@ public class Main {
             }
 
             System.out.println(Utils.title("Fin du programme"));
-        }
+        }*/
+
+        IHM.mainMenu();
     }
 }
