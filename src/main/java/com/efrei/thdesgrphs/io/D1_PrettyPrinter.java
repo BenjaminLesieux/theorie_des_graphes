@@ -1,12 +1,16 @@
 package com.efrei.thdesgrphs.io;
 
 import java.io.PrintStream;
-import java.util.Objects;
 
 /**
- * Code by Lyubomyr Shaydariv and modified to fit our project
+ * Code by Lyubomyr Shaydariv and modified to fit our project <br><br>
+ *
+ * This code, modified by our team, allows us to print 2d arrays of strings
+ * in a way similar to what SQL tables look like on console. <br><br>
+ *
+ * With this, columns and rows have the right proportions according to the size of the values inside
  */
-public final class PrettyPrinter {
+public final class D1_PrettyPrinter {
 
     private static final char BORDER_KNOT = '+';
     private static final char HORIZONTAL_BORDER = '-';
@@ -17,11 +21,11 @@ public final class PrettyPrinter {
     private final PrintStream out;
     private final String asNull;
 
-    public PrettyPrinter(PrintStream out) {
+    public D1_PrettyPrinter(PrintStream out) {
         this(out, DEFAULT_AS_NULL);
     }
 
-    public PrettyPrinter(PrintStream out, String asNull) {
+    public D1_PrettyPrinter(PrintStream out, String asNull) {
         if (out == null) {
             throw new IllegalArgumentException("No print stream provided");
         }

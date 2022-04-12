@@ -1,6 +1,9 @@
 package com.efrei.thdesgrphs.io;
 
-public class Utils {
+/**
+ * Utils is a utility class with some useful methods
+ * */
+public class D1_Utils {
 
     public static String title(String message) {
         int length = message.length();

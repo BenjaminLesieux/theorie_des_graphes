@@ -1,11 +1,11 @@
 package com.efrei.thdesgrphs.dates;
 
-public enum DateType {
+public enum D1_DateType {
     SOONEST("Dates au plus tot"), LATEST("Dates au plus tard"), MARGINS("Marges");
 
     private String stringValue;
 
-    DateType(String stringValue) {
+    D1_DateType(String stringValue) {
         this.stringValue = stringValue;
     }
 

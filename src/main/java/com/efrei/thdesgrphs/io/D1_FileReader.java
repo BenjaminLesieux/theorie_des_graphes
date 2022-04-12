@@ -1,20 +1,29 @@
 package com.efrei.thdesgrphs.io;
 
-import com.efrei.thdesgrphs.automaton.Automaton;
-import com.efrei.thdesgrphs.automaton.State;
+import com.efrei.thdesgrphs.automaton.D1_Automaton;
+import com.efrei.thdesgrphs.automaton.D1_State;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class FileReader {
+/**
+ * The FileReader class is just used to read a file and to create a graph from it
+ * */
+public class D1_FileReader {
 
-    public static Automaton readFile(String path) {
+    /**
+     * Reads a file and creates a graph from it
+     *
+     * @param path the path of the file
+     * @return {@link D1_Automaton}
+     * */
+    public static D1_Automaton readFile(String path) {
 
         File file = new File(path);
         Scanner scanner;
-        Automaton automaton = new Automaton(file.getName());
+        D1_Automaton automaton = new D1_Automaton(file.getName());
 
         try {
             scanner = new Scanner(file);
@@ -28,7 +37,7 @@ public class FileReader {
             var line = scanner.nextLine();
             var values = line.split(" ");
 
-            if (!Utils.isAnInt(values[0]) || !Utils.isAnInt(values[1])) continue;
+            if (!D1_Utils.isAnInt(values[0]) || !D1_Utils.isAnInt(values[1])) continue;
 
             var id = Integer.parseInt(values[0]);
             var cost = Integer.parseInt(values[1]);
@@ -37,14 +46,14 @@ public class FileReader {
 
             if (values.length > 2) {
                 for (int i = 2; i < values.length; i++) {
-                    if (!Utils.isAnInt(values[i])) continue;
+                    if (!D1_Utils.isAnInt(values[i])) continue;
                     predecessors.add(Integer.parseInt(values[i]));
                 }
             }
 
             if (automaton.getByID(id) != null) System.out.println("L'état " + id + " existe déjà dans le graphe");
             else {
-                var state = new State(id, cost, predecessors, new ArrayList<>());
+                var state = new D1_State(id, cost, predecessors, new ArrayList<>());
                 automaton.addState(state);
             }
         } while (scanner.hasNextLine());

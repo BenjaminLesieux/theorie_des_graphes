@@ -1,24 +1,32 @@
 package com.efrei.thdesgrphs.dates;
 
-import com.efrei.thdesgrphs.automaton.Automaton;
-import com.efrei.thdesgrphs.automaton.State;
-import com.efrei.thdesgrphs.io.PrettyPrinter;
-import com.efrei.thdesgrphs.io.Utils;
+import com.efrei.thdesgrphs.automaton.D1_Automaton;
+import com.efrei.thdesgrphs.automaton.D1_State;
+import com.efrei.thdesgrphs.io.D1_PrettyPrinter;
+import com.efrei.thdesgrphs.io.D1_Utils;
+import com.efrei.thdesgrphs.operations.D1_Scheduling;
 
 import java.util.*;
 
-public class Date {
+/**
+ * Date is a class that deals with all the computions concerning the dates. <br><br>
+ * 
+ * It can calculate the earliest dates, the latest dates as well as the margins and the critical paths
+ * */
+public class D1_Date {
 
-    private final Automaton correspondingAutomaton;
+    private final D1_Automaton correspondingAutomaton;
 
     private final List<Integer> ranks;
-    private final List<State> states;
+    private final List<D1_State> states;
 
-    private final Map<State, Integer> earliestDate;
-    private final Map<State, Integer> latestDate;
-    private final Map<State, Integer> margins;
+    private final List<List<D1_State>> criticalPaths;
 
-    public Date(Automaton correspondingAutomaton) {
+    private final Map<D1_State, Integer> earliestDate;
+    private final Map<D1_State, Integer> latestDate;
+    private final Map<D1_State, Integer> margins;
+
+    public D1_Date(D1_Automaton correspondingAutomaton) {
         this.correspondingAutomaton = correspondingAutomaton;
 
         this.ranks = correspondingAutomaton.getRanks().values()
@@ -34,9 +42,15 @@ public class Date {
         this.earliestDate = new LinkedHashMap<>();
         this.latestDate = new LinkedHashMap<>();
         this.margins = new LinkedHashMap<>();
+        this.criticalPaths = new ArrayList<>();
     }
 
-    public int getEarliestDate(State state) {
+    /**
+     * Returns the earliest date of a state 
+     * @param state the state 
+     * @return an integer that corresponds to the earliest date 
+     * */
+    public int getEarliestDate(D1_State state) {
 
         if (!earliestDate.isEmpty() && earliestDate.containsKey(state)) return earliestDate.get(state);
         else if (state.predecessors().isEmpty()) return 0;
@@ -45,14 +59,19 @@ public class Date {
         List<Integer> dates = new ArrayList<>();
 
         for (Integer predecessor : predecessors) {
-            State predecessorState = this.correspondingAutomaton.getByID(predecessor);
+            D1_State predecessorState = this.correspondingAutomaton.getByID(predecessor);
             dates.add(getEarliestDate(predecessorState) + predecessorState.cost());
         }
 
         return dates.stream().max(Integer::compareTo).orElse(0);
     }
 
-    public int getLatestDate(State state) {
+    /**
+     * Returns the latest date of a state 
+     * @param state the state 
+     * @return an integer that corresponds to the latest date 
+     * */
+    public int getLatestDate(D1_State state) {
 
         if (!latestDate.isEmpty() && latestDate.containsKey(state)) return latestDate.get(state);
 
@@ -60,30 +79,43 @@ public class Date {
             return getEarliestDate(state);
         }
 
-        List<State> successors = state.successors();
+        List<D1_State> successors = state.successors();
         List<Integer> dates = new ArrayList<>();
 
-        for (State successor : successors) {
+        for (D1_State successor : successors) {
             dates.add(getLatestDate(successor) - state.cost());
         }
 
         return dates.stream().min(Integer::compareTo).orElse(0);
     }
 
-    public int calculateMargin(State state) {
+    /**
+     * Calculates the margins by computing {@link D1_Date#getLatestDate(D1_State)} - {@link D1_Date#getEarliestDate(D1_State)}
+     * */
+    public int calculateMargin(D1_State state) {
         return getLatestDate(state) - getEarliestDate(state);
     }
 
+    /**
+     * This function can be called so that once you try to compute {@link #getEarliestDate(D1_State)} or any
+     * other such method it will take its value from the corresponding map
+     * */
     public void buildDates() {
-        for (State state : states) {
+        for (D1_State state : states) {
             this.earliestDate.put(state, getEarliestDate(state));
             this.latestDate.put(state, getLatestDate(state));
             this.margins.put(state, calculateMargin(state));
         }
     }
 
-    public void printPrettyDates(DateType type) {
-        System.out.println(Utils.title(type.getStringValue()));
+    /**
+     * This function print the result in a 'very' pretty way kinda similar
+     * to the way we've been writing dates in class
+     *
+     * @param type the type of the date (earliest, soonest, margins)
+     * */
+    public void printPrettyDates(D1_DateType type) {
+        System.out.println(D1_Utils.title(type.getStringValue()));
 
         List<List<String>> listToPrint = new ArrayList<>();
 
@@ -106,7 +138,7 @@ public class Date {
                 listToPrint.add(new ArrayList<>());
                 listToPrint.get(4).add("Dates au plus tôt");
 
-                for (State state : states) {
+                for (D1_State state : states) {
                     List<Integer> dates = new ArrayList<>();
                     state.predecessors().forEach(p -> dates.add(
                             getEarliestDate(correspondingAutomaton.getByID(p))
@@ -128,10 +160,10 @@ public class Date {
                 listToPrint.add(new ArrayList<>());
                 listToPrint.get(4).add("Dates au plus tard");
 
-                for (State state : states) {
+                for (D1_State state : states) {
                     List<Integer> dates = new ArrayList<>();
                     state.successors().forEach(s -> dates.add(getLatestDate(s)-state.cost()));
-                    listToPrint.get(2).add(state.successors().stream().map(State::id).toList().toString());
+                    listToPrint.get(2).add(state.successors().stream().map(D1_State::id).toList().toString());
                     listToPrint.get(3).add(dates.toString());
                     listToPrint.get(4).add(String.valueOf(getLatestDate(state)));
                 }
@@ -141,16 +173,62 @@ public class Date {
                 listToPrint.add(new ArrayList<>());
                 listToPrint.get(2).add("Marge");
 
-                for (State state : states) {
+                for (D1_State state : states) {
                     listToPrint.get(2).add(String.valueOf(calculateMargin(state)));
                 }
             }
         }
 
         String[][] toPrint = listToPrint.stream().map(u -> u.toArray(new String[0])).toArray(String[][]::new);
-        PrettyPrinter prettyPrinter = new PrettyPrinter(System.out, "");
+        D1_PrettyPrinter prettyPrinter = new D1_PrettyPrinter(System.out, "");
         prettyPrinter.print(toPrint);
     }
+
+    /**
+     * Print all the critical paths
+     * */
+    public void showCriticalPaths() {
+        System.out.println();
+        System.out.println(D1_Utils.title("Chemin(s) critique(s)"));
+
+        showCriticalPath(correspondingAutomaton.getByID(0), new ArrayList<>());
+
+        for (List<D1_State> criticalPath : this.criticalPaths) {
+            Integer sum = criticalPath.stream().map(D1_State::cost).reduce(Integer::sum).orElse(0);
+
+            int maxOmegaValue = getLatestDate(
+                    correspondingAutomaton.getByID(D1_Scheduling.getExitsID(correspondingAutomaton).get(0))
+            );
+
+            if (sum == maxOmegaValue)
+                System.out.println(criticalPath + " = " + sum);
+        }
+
+        System.out.println();
+    }
+
+    /**
+     * Calculates a critical path <br>
+     * WARNING: the path may not be a real critical path in the case of a graph having many
+     * therefore using {@link #showCriticalPaths()} is the right way to print all the 'real' critical paths
+     * */
+    public void showCriticalPath(D1_State current, List<D1_State> visited) {
+        if (!visited.contains(current))
+            visited.add(current);
+
+        if (current.successors().isEmpty()) {
+            this.criticalPaths.add(visited);
+        }
+
+        else {
+            for (D1_State successor : current.successors()) {
+                if (margins.get(successor) == 0) {
+                    showCriticalPath(successor, new ArrayList<>(visited));
+                }
+            }
+        }
+    }
+
 
     @Override
     public String toString() {

@@ -1,13 +1,17 @@
 package com.efrei.thdesgrphs.automaton;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public record State(int id, int cost, List<Integer> predecessors, List<State> successors) implements Comparable<State> {
+/**
+ * A State holds the data for a task such as its id, its cost. <br><br>
+ * A State has a list of predecessors which contains the id of said predecessors <br><br>
+ * A state has a list of successors which points to each successor
+ * */
+public record D1_State(int id, int cost, List<Integer> predecessors, List<D1_State> successors) implements Comparable<D1_State> {
 
     @Override
-    public int compareTo(State o) {
+    public int compareTo(D1_State o) {
         if (this.id > o.id()) return 1;
         else if (this.id < o.id()) return -1;
         return 0;
@@ -15,7 +19,7 @@ public record State(int id, int cost, List<Integer> predecessors, List<State> su
 
     @Override
     public String toString() {
-        return "État " + String.valueOf(this.id());
+        return "État " + this.id();
     }
 
     @Override
@@ -29,7 +33,7 @@ public record State(int id, int cost, List<Integer> predecessors, List<State> su
         if (getClass() != o.getClass())
             return false;
 
-        State s = (State) o;
+        D1_State s = (D1_State) o;
         return Objects.equals(id(), s.id());
     }
 }

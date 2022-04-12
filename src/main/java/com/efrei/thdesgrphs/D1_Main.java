@@ -1,28 +1,23 @@
 package com.efrei.thdesgrphs;
 
-import com.efrei.thdesgrphs.automaton.Automaton;
-import com.efrei.thdesgrphs.automaton.State;
-import com.efrei.thdesgrphs.dates.Date;
-import com.efrei.thdesgrphs.dates.DateType;
-import com.efrei.thdesgrphs.io.FileReader;
-import com.efrei.thdesgrphs.io.IHM;
-import com.efrei.thdesgrphs.io.Utils;
-import com.efrei.thdesgrphs.operations.Operations;
-import com.efrei.thdesgrphs.operations.Scheduling;
+import com.efrei.thdesgrphs.io.D1_IHM;
 
 import java.io.*;
-import java.util.Objects;
-import java.util.Scanner;
 
-public class Main {
+public class D1_Main {
 
     public static void main(String[] args) throws IOException {
-/*        var defaultPath = "src/main/java/com/efrei/thdesgrphs/files/";
+
+        D1_IHM.mainMenu();
+
+/*      Ce code sert à exécuter puis à remplir les traces dans le fichier ci-dessous
+
+        var defaultPath = "src/main/java/com/efrei/thdesgrphs/files/";
 
         var file = new File(defaultPath + "tests/");
         var maxFiles = Objects.requireNonNull(file.listFiles()).length;
 
-        for (int i = 0; i < maxFiles; i++) {
+        for (int i = 0; i < maxFiles-1; i++) {
             // Store current System.out before assigning a new value
             PrintStream console = System.out;
 
@@ -51,11 +46,10 @@ public class Main {
                 date.printPrettyDates(DateType.SOONEST);
                 date.printPrettyDates(DateType.LATEST);
                 date.printPrettyDates(DateType.MARGINS);
+                date.showCriticalPaths();
             }
 
             System.out.println(Utils.title("Fin du programme"));
         }*/
-
-        IHM.mainMenu();
     }
 }

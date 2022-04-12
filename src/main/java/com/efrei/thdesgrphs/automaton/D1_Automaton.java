@@ -1,21 +1,23 @@
 package com.efrei.thdesgrphs.automaton;
 
-import com.efrei.thdesgrphs.io.Utils;
-import com.efrei.thdesgrphs.operations.Scheduling;
+import com.efrei.thdesgrphs.io.D1_Utils;
 
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class Automaton implements Cloneable {
+/**
+ * Represents a graph. A graph is composed of a list of {@link D1_State}.
+ * */
+public class D1_Automaton implements Cloneable {
 
-    private final List<State> states;
+    private final List<D1_State> states;
     private final Map<Integer, Integer> ranks;
     private final String name;
 
     private int[][] valuesMatrix;
     private int[][] adjacencyMatrix;
 
-    public Automaton(String name) {
+    public D1_Automaton(String name) {
         this.states = new ArrayList<>();
         this.ranks = new LinkedHashMap<>();
         this.name = name;
@@ -25,36 +27,53 @@ public class Automaton implements Cloneable {
         return name;
     }
 
-    public List<State> getStates() {
+    public List<D1_State> getStates() {
         return states;
     }
 
-    public void addState(State state) {
+    /**
+     * Adds a new state to the graph
+     * */
+    public void addState(D1_State state) {
         if (!this.states.contains(state)) {
             this.states.add(state);
             Collections.sort(this.states);
         }
     }
 
-    public State getByID(int id) {
-        for (State state : this.states) {
+    /**
+     * Find a state by its id
+     *
+     * @param id the id of the state
+     * @return {@link D1_State} if found
+     * */
+    public D1_State getByID(int id) {
+        for (D1_State state : this.states) {
             if (state.id() == id) return state;
         }
 
         return null;
     }
 
+    /**
+     * At first {@link D1_State} has an empty successors list
+     * therefore we need to fill it with this function
+     * before doing any scheduling algorithm
+     * */
     public void loadSuccessors() {
-        for (State state : states) {
+        for (D1_State state : states) {
             List<Integer> predecessors = state.predecessors();
-            List<State> predecessorsStates = predecessors.stream().map(this::getByID).filter(Objects::nonNull).toList();
+            List<D1_State> predecessorsStates = predecessors.stream().map(this::getByID).filter(Objects::nonNull).toList();
 
-            for (State predecessor : predecessorsStates) {
+            for (D1_State predecessor : predecessorsStates) {
                 predecessor.successors().add(state);
             }
         }
     }
 
+    /**
+     * Calculates the values matrix of the graph
+     * */
     public void calculateValuesMatrix() {
         int[][] valMatrix = new int[states.size()][states.size()];
 
@@ -74,6 +93,9 @@ public class Automaton implements Cloneable {
         this.valuesMatrix = valMatrix;
     }
 
+    /**
+     * Calculates the adjacency matrix of the graph
+     * */
     public void calculateAdjacencyMatrix() {
         int[][] adjacencyMatrix = new int[states.size()][states.size()];
 
@@ -93,10 +115,19 @@ public class Automaton implements Cloneable {
         this.adjacencyMatrix = adjacencyMatrix;
     }
 
+    /**
+     * @return the adjacency matrix of the graph
+     * */
     public int[][] getAdjacencyMatrix() {
+
+        if (this.adjacencyMatrix.length == 0) this.calculateAdjacencyMatrix();
+
         return adjacencyMatrix;
     }
 
+    /**
+     * @return the values matrix of the graph
+     * */
     public int[][] getValuesMatrix() {
 
         if (this.valuesMatrix.length == 0) this.calculateValuesMatrix();
@@ -104,16 +135,23 @@ public class Automaton implements Cloneable {
         return valuesMatrix;
     }
 
+    /**
+     * This method calculates the rank of the graph
+     * It works by using a queue and by calculating the rank of each state in the rising order.
+     * Once computed, the rank is put in a map : {@code ranks}
+     * */
     public void calculateRanks() {
-        System.out.println(Utils.title("Calcule des rangs des états de : " + name));
+        System.out.println(D1_Utils.title("Calcule des rangs des états de : " + name));
 
         Queue<Integer> waitingStates = new ArrayBlockingQueue<>(states.size());
-        waitingStates.addAll(states.stream().map(State::id).toList());
+        waitingStates.addAll(states.stream().map(D1_State::id).toList());
 
         while (!waitingStates.isEmpty()) {
             Integer currentStateID = waitingStates.remove();
-            State currentState = getByID(currentStateID);
+            D1_State currentState = getByID(currentStateID);
 
+            // If the state has no predecessors (i.e - it's the alpha state)
+            // then the rank is obviously 0
             if (currentState.predecessors().isEmpty()) {
                 ranks.put(currentStateID, 0);
                 System.out.println(currentStateID + " est un état d'entrée, il possède donc le rang 0");
@@ -122,6 +160,10 @@ public class Automaton implements Cloneable {
                 List<Integer> predecessors = currentState.predecessors();
                 List<Integer> unknownRanks = predecessors.stream().filter(state -> !ranks.containsKey(state)).toList();
 
+                /*
+                * If there are some unknown ranks we need to calculate before the state
+                * we are going to put state back in the queue after those unknown states
+                * */
                 if (!unknownRanks.isEmpty()) {
                     for (Integer unknown : unknownRanks) {
                         if (!waitingStates.contains(unknown)) {
@@ -147,6 +189,9 @@ public class Automaton implements Cloneable {
         }
     }
 
+    /**
+     * @return the map of the ranks of all the states
+     * */
     public Map<Integer, Integer> getRanks() {
         return ranks;
     }
@@ -155,9 +200,9 @@ public class Automaton implements Cloneable {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append(Utils.title("Automate:" + name));
+        stringBuilder.append(D1_Utils.title("Automate:" + name));
 
-        for(State s : this.states) {
+        for(D1_State s : this.states) {
             stringBuilder.append(s.predecessors()).append(" -> ").append(s).append(" -> ").append(s.successors());
             stringBuilder.append("\n");
         }
@@ -165,12 +210,16 @@ public class Automaton implements Cloneable {
         return stringBuilder.toString();
     }
 
+    /**
+     * Make a deep copy of the graph
+     * @return a deep copy of the graph
+     * */
     @Override
-    public Automaton clone() {
-        Automaton a = new Automaton(this.name);
+    public D1_Automaton clone() {
+        D1_Automaton a = new D1_Automaton(this.name);
 
-        for (State s : List.copyOf(this.states)) {
-            State copiedState = new State(s.id(), s.cost(), new ArrayList<>(), new ArrayList<>());
+        for (D1_State s : List.copyOf(this.states)) {
+            D1_State copiedState = new D1_State(s.id(), s.cost(), new ArrayList<>(), new ArrayList<>());
 
             for (Integer pred : s.predecessors()) {
                 copiedState.predecessors().add(pred);

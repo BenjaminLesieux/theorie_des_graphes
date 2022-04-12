@@ -1,10 +1,10 @@
 package com.efrei.thdesgrphs.io;
 
-import com.efrei.thdesgrphs.automaton.Automaton;
-import com.efrei.thdesgrphs.dates.Date;
-import com.efrei.thdesgrphs.dates.DateType;
-import com.efrei.thdesgrphs.operations.Operations;
-import com.efrei.thdesgrphs.operations.Scheduling;
+import com.efrei.thdesgrphs.automaton.D1_Automaton;
+import com.efrei.thdesgrphs.dates.D1_Date;
+import com.efrei.thdesgrphs.dates.D1_DateType;
+import com.efrei.thdesgrphs.operations.D1_Operations;
+import com.efrei.thdesgrphs.operations.D1_Scheduling;
 
 import java.io.File;
 import java.util.Objects;
@@ -14,13 +14,13 @@ import java.util.Scanner;
  * The goal of the IHM is to simulate the console interface
  * for the user to perform operations on a graph
  * */
-public class IHM {
+public class D1_IHM {
 
     /**
      * The automaton on which we will perform
      * the operations
      * */
-    private static Automaton automaton;
+    private static D1_Automaton automaton;
     private static Scanner scanner;
 
     public static void mainMenu() {
@@ -29,22 +29,24 @@ public class IHM {
         var choice = "";
 
         var file = new File(defaultPath + "tests/");
-        var maxFiles = Objects.requireNonNull(file.listFiles()).length;
+
+        // -1 because of the /traces directory
+        var maxFiles = Objects.requireNonNull(file.listFiles()).length - 1;
 
 
         while (!choice.equalsIgnoreCase("q")) {
             System.out.println("\n".repeat(3));
-            System.out.println(Utils.title("Menu principal"));
-            System.out.format("Veuillez choisir un automate : (entrez un nombre entre 1 et %d): ", maxFiles);
+            System.out.println(D1_Utils.title("Menu principal"));
+            System.out.format("Veuillez choisir un automate : (entrez un nombre entre 1 et %d ou 'q' pour quitter): ", maxFiles);
             choice = scanner.next();
 
             // if the choice is an integer
-            if (Utils.isAnInt(choice)) {
+            if (D1_Utils.isAnInt(choice)) {
                 var intChoice = Integer.parseInt(choice);
 
                 if (intChoice >= 1 && intChoice <= maxFiles) {
-                    automaton = FileReader.readFile(file.getPath() + "/table " + (intChoice) + ".txt");
-                    Operations.showValuesMatrix(automaton);
+                    automaton = D1_FileReader.readFile(file.getPath() + "/table " + (intChoice) + ".txt");
+                    D1_Operations.showValuesMatrix(automaton);
                     operationsMenu();
                 }
             }
@@ -64,7 +66,7 @@ public class IHM {
 
         while (!choice.equalsIgnoreCase("q")) {
             System.out.println("\n".repeat(2));
-            System.out.println(Utils.title("Menu des opérations"));
+            System.out.println(D1_Utils.title("Menu des opérations"));
 
             System.out.print("""
                     1. Affichage de la matrice de d'adjacence
@@ -77,15 +79,26 @@ public class IHM {
 
             choice = scanner.next();
 
-            if (Utils.isAnInt(choice)) {
+            if (D1_Utils.isAnInt(choice)) {
                 var intChoice = Integer.parseInt(choice);
 
                 switch (intChoice) {
-                    case 1 -> Operations.showAdjacencyMatrix(automaton);
-                    case 2 -> Operations.showValuesMatrix(automaton);
+                    case 1 -> D1_Operations.showAdjacencyMatrix(automaton);
+                    case 2 -> D1_Operations.showValuesMatrix(automaton);
                     case 3 -> {
-                        if(Scheduling.isSchedulingGraph(automaton))
+
+                        boolean scheduling = D1_Scheduling.isSchedulingGraph(automaton);
+
+                        if(scheduling)
                             datesMenu();
+                        else {
+                            System.out.println("\nVoulez-vous changer de graphe ? (y/n) : ");
+                            choice = scanner.next();
+
+                            if (choice.equalsIgnoreCase("y")) {
+                                choice = "q";
+                            }
+                        }
                     }
                 }
             }
@@ -105,7 +118,7 @@ public class IHM {
 
         while (!choice.equalsIgnoreCase("q")) {
             System.out.println("\n".repeat(2));
-            System.out.println(Utils.title("Calcul des dates"));
+            System.out.println(D1_Utils.title("Calcul des dates"));
 
             System.out.print("""
                     1. Calcul des dates au plus tôt et au plus tard
@@ -116,7 +129,7 @@ public class IHM {
 
             choice = scanner.next();
 
-            if (Utils.isAnInt(choice)) {
+            if (D1_Utils.isAnInt(choice)) {
                 var intChoice = Integer.parseInt(choice);
                 if (intChoice == 1) {
 
@@ -125,12 +138,12 @@ public class IHM {
                     else
                         automaton.calculateRanks();
 
-                    Date date = new Date(automaton);
+                    D1_Date date = new D1_Date(automaton);
                     date.buildDates();
-                    date.printPrettyDates(DateType.SOONEST);
-                    date.printPrettyDates(DateType.LATEST);
-                    date.printPrettyDates(DateType.MARGINS);
-                    System.out.println(date);
+                    date.printPrettyDates(D1_DateType.SOONEST);
+                    date.printPrettyDates(D1_DateType.LATEST);
+                    date.printPrettyDates(D1_DateType.MARGINS);
+                    date.showCriticalPaths();
                 }
             }
 
