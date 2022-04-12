@@ -82,7 +82,7 @@ Suppression du point d'entrée suivant : État 12
 
 Les états [État 4, État 5, État 6, État 7, État 8, État 9, État 10, État 11, État 13] n'ont pas pu être supprimés
 L'État 4 est à l'origine du cycle
-Votre graphe n'est pas un graphe d'ordonnancement
+Votre graphe n'est pas un graphe d'ordonnancement car il possède un circuit
 ------------------------------------------------
                 Fin du programme                
 ------------------------------------------------

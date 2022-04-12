@@ -1,8 +1,15 @@
 package com.efrei.thdesgrphs;
 
+import com.efrei.thdesgrphs.dates.D1_Date;
+import com.efrei.thdesgrphs.dates.D1_DateType;
+import com.efrei.thdesgrphs.io.D1_FileReader;
 import com.efrei.thdesgrphs.io.D1_IHM;
+import com.efrei.thdesgrphs.io.D1_Utils;
+import com.efrei.thdesgrphs.operations.D1_Operations;
+import com.efrei.thdesgrphs.operations.D1_Scheduling;
 
 import java.io.*;
+import java.util.Objects;
 
 public class D1_Main {
 
@@ -10,9 +17,9 @@ public class D1_Main {
 
         D1_IHM.mainMenu();
 
-/*      Ce code sert à exécuter puis à remplir les traces dans le fichier ci-dessous
+        //Ce code sert à exécuter puis à remplir les traces dans le fichier ci-dessous
 
-        var defaultPath = "src/main/java/com/efrei/thdesgrphs/files/";
+        /*var defaultPath = "src/main/java/com/efrei/thdesgrphs/files/";
 
         var file = new File(defaultPath + "tests/");
         var maxFiles = Objects.requireNonNull(file.listFiles()).length;
@@ -28,28 +35,28 @@ public class D1_Main {
             }
 
             var graphFile = new File(defaultPath + "/tests/table " + (i+1) + ".txt");
-            var graph = FileReader.readFile(graphFile.getPath());
+            var graph = D1_FileReader.readFile(graphFile.getPath());
 
             PrintStream fileOut = new PrintStream(new FileOutputStream(defaultPath + "/tests/traces/table " + (i+1) + ".txt"));
             System.setOut(fileOut);
 
             assert graph != null;
 
-            Operations.showAdjacencyMatrix(graph);
-            Operations.showValuesMatrix(graph);
+            D1_Operations.showAdjacencyMatrix(graph);
+            D1_Operations.showValuesMatrix(graph);
 
-            if (Scheduling.isSchedulingGraph(graph)) {
-                Operations.showValuesMatrix(graph);
+            if (D1_Scheduling.isSchedulingGraph(graph)) {
+                D1_Operations.showValuesMatrix(graph);
                 graph.calculateRanks();
-                Date date = new Date(graph);
+                D1_Date date = new D1_Date(graph);
                 date.buildDates();
-                date.printPrettyDates(DateType.SOONEST);
-                date.printPrettyDates(DateType.LATEST);
-                date.printPrettyDates(DateType.MARGINS);
+                date.printPrettyDates(D1_DateType.SOONEST);
+                date.printPrettyDates(D1_DateType.LATEST);
+                date.printPrettyDates(D1_DateType.MARGINS);
                 date.showCriticalPaths();
             }
 
-            System.out.println(Utils.title("Fin du programme"));
+            System.out.println(D1_Utils.title("Fin du programme"));
         }*/
     }
 }

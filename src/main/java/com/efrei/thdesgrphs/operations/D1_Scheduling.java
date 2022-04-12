@@ -20,17 +20,28 @@ public class D1_Scheduling {
      * <br>• arcs incident to the outside at the entry point have a zero value
      * */
     public static boolean isSchedulingGraph(D1_Automaton automaton) {
-        if (hasCircuits(automaton) || hasNegativeCosts(automaton)) {
-            // the last conditions aren't checked because the code is made so that it isn't required
-            System.out.println("Votre graphe n'est pas un graphe d'ordonnancement");
+        if (hasCircuits(automaton)) {
+            System.out.println("Votre graphe n'est pas un graphe d'ordonnancement car il possède un circuit");
             return false;
         }
 
+        else if (hasNegativeCosts(automaton)) {
+            System.out.println("Votre graphe n'est pas un graphe d'ordonnancement car il possède des coûts négatifs");
+            return false;
+        }
+
+        // the last conditions aren't checked because the code is made so that it isn't required
         // if the above conditions are true, then we can add the 'alpha' and 'omega' states
         // to make the graph a scheduling graph
         D1_Operations.addAlphaState(automaton);
         D1_Operations.addOmegaState(automaton);
 
+        System.out.println("Nombre d'entrées : " + getEntriesID(automaton).size());
+        System.out.println("Nombre de sorties : " + getExitsID(automaton).size());
+        System.out.println("\nTous les arcs d'un sommet ont bien le même coût");
+        System.out.println("Les arcs 0->" + automaton.getByID(0).successors() + " sont nuls");
+        System.out.println("Il n'y a pas d'arcs négatifs");
+        System.out.println("Il n'y a pas de circuits");
         System.out.println("Votre graphe est désormais bien un graphe d'ordonnancement !");
 
         return true;

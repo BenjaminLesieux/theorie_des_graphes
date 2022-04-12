@@ -86,11 +86,11 @@ public class D1_IHM {
                     case 1 -> D1_Operations.showAdjacencyMatrix(automaton);
                     case 2 -> D1_Operations.showValuesMatrix(automaton);
                     case 3 -> {
-
-                        boolean scheduling = D1_Scheduling.isSchedulingGraph(automaton);
+                        D1_Automaton cloneAutomaton = automaton.clone();
+                        boolean scheduling = D1_Scheduling.isSchedulingGraph(cloneAutomaton);
 
                         if(scheduling)
-                            datesMenu();
+                            datesMenu(cloneAutomaton);
                         else {
                             System.out.println("\nVoulez-vous changer de graphe ? (y/n) : ");
                             choice = scanner.next();
@@ -113,7 +113,7 @@ public class D1_IHM {
         }
     }
 
-    public static void datesMenu() {
+    public static void datesMenu(D1_Automaton perform) {
         var choice = "";
 
         while (!choice.equalsIgnoreCase("q")) {
@@ -133,12 +133,14 @@ public class D1_IHM {
                 var intChoice = Integer.parseInt(choice);
                 if (intChoice == 1) {
 
-                    if (!automaton.getRanks().isEmpty())
-                        System.out.println("Les rangs de ce graphe ont déjà été calculés : " + automaton.getRanks());
+                    if (!perform.getRanks().isEmpty())
+                        System.out.println("Les rangs de ce graphe ont déjà été calculés : " + perform.getRanks());
                     else
-                        automaton.calculateRanks();
+                        perform.calculateRanks();
 
-                    D1_Date date = new D1_Date(automaton);
+                    D1_Operations.showValuesMatrix(perform);
+
+                    D1_Date date = new D1_Date(perform);
                     date.buildDates();
                     date.printPrettyDates(D1_DateType.SOONEST);
                     date.printPrettyDates(D1_DateType.LATEST);

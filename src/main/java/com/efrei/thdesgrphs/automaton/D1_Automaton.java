@@ -80,7 +80,7 @@ public class D1_Automaton implements Cloneable {
         for (int i = 0; i < states.size(); i++) {
             for (int j = 0; j < states.size(); j++) {
 
-                if (states.get(j).predecessors().contains(i+1)) {
+                if (states.get(j).predecessors().contains(states.get(i).id())) {
                     valMatrix[i][j] = states.get(i).cost();
                 }
 
@@ -102,7 +102,7 @@ public class D1_Automaton implements Cloneable {
         for (int i = 0; i < states.size(); i++) {
             for (int j = 0; j < states.size(); j++) {
 
-                if (states.get(j).predecessors().contains(i+1)) {
+                if (states.get(j).predecessors().contains(states.get(i).id())) {
                     adjacencyMatrix[i][j] = 1;
                 }
 
